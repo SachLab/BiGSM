@@ -1,10 +1,12 @@
+%%%% Example of running GRN inference with BiGSM and GeneSPIDER %%%%%
+
 clear
-addpath(genpath('../grn/genespider'));
+addpath(genpath('../grn/genespider'));  % replace with your genespider path
 
 % define the size of your data and network
 N = 50;
 % define desired sparsity degree, e.g. 3 edges per node on average
-S = 3;%/(N);
+S = 3;
 
 % create scale-free network that gives probability to edges
 A = datastruct.scalefree2(N, S); % A is the network matrix
@@ -18,7 +20,7 @@ Net = datastruct.Network(A, 'myNetwork');
 
 % define perturbation matrix for the experiment
 % for two replicates
-P = -[eye(N)]; %sample perturbation matrix
+P = -[eye(N) eye(N)]; %sample perturbation matrix
 % create data
 X = Net.G*P; % G - static gain model, A - network
 % add noise to data
@@ -48,15 +50,15 @@ D(1).sdP = zeros(size(D.P));
 Data = datastruct.Dataset(D, Net);
 
 
-%%%%% Sovlving A matrix via Bayesian Compressive sensing %%%%%
+%%%%% Inferring using BiGSM algorithm %%%%%
 max_iter = 15;
 
-A_est_bcs = bigsm(D.Y, P, max_iter, size(A));
+A_est_bigsm = bigsm(D.Y, P, max_iter, size(A));
 
 % Choose a baseline to compare
-infMethod = 'lsco'; % lsco LSCON lasso svmc GENIE3 Zscore
+infMethod = 'LSCON'; % lsco LSCON lasso svmc GENIE3 Zscore
 
-zeta = logspace(-20,0,30);
+zeta = logspace(-10,0,100);
 
 % [Aest_ls, z0] = Methods.(infMethod)(Data,zeta);
 % 
@@ -68,25 +70,24 @@ for j=1:size(Aest_ls, 3)
     Aest_ls(:,:,j) = infer_net;
 end
 
-% % Remove self loop
+% Remove self loop
 A = A.*(eye(height(A))-1);
 Net = datastruct.Network(A, 'myNetwork');
 
-% 
-A_est_bcs = A_est_bcs.*(eye(height(A))-1);
-A_est_bcs_co = manual_test(A_est_bcs, zeta);
+A_est_bigsm = A_est_bigsm.*(eye(height(A))-1);
+A_est_bigsm_co = manual_test(A_est_bigsm, zeta);
 
 
 % compare models
 M1 = analyse.CompareModels(Net,Aest_ls);
-M2 = analyse.CompareModels(Net,A_est_bcs_co);
+M2 = analyse.CompareModels(Net,A_est_bigsm_co);
 
 disp(" ")
 disp("MAX_F1_"+infMethod+" = "+string(max(M1.F1)))
-disp("MAX_F1_BCS = "+string(max(M2.F1)))
+disp("MAX_F1_BiGSM = "+string(max(M2.F1)))
 disp(" ")
 disp("AUROC_"+infMethod+" = "+string(M1.AUROC))
-disp("AUROC_BCS = "+string(M2.AUROC))
+disp("AUROC_BiGSM = "+string(M2.AUROC))
 disp(" ")
 disp("AUPR_"+infMethod+" = "+string(M1.AUPR))
-disp("AUPR_BCS = "+string(M2.AUPR))
+disp("AUPR_BiGSM = "+string(M2.AUPR))

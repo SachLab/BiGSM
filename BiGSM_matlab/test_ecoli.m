@@ -1,5 +1,7 @@
+%%%% Benchmarking on E.coli biological GRN and expression data %%%%%
+
 clear
-addpath(genpath('../grn/genespider'));
+addpath(genpath('../grn/genespider')); % replace with your genespider path
 
 % define the size of your data and network
 N = 9;
@@ -7,7 +9,9 @@ N = 9;
 infMethods = ["LSCON" "lasso" "svmc" "Zscore" "GENIE3"];
 
 
-P = -[eye(N)];
+P = -[eye(N)];  % define purturbation
+
+% import expression matrix
 Y = [0.906 -0.132 -0.139 0.187 0.291 -0.061 -0.077 -0.017 -0.025;
      0.212 0.383 -0.117 0.064 0.169 -0.087 0.039 0.125 0.084;
      0.018 -0.107 10.524 0.061 0.080 0.013 0.064 0.089 -0.070;
@@ -32,7 +36,7 @@ D(1).sdP = zeros(size(D.P));
 
 % create a Data object with data "D" and scale-free network "Net"
 Data = datastruct.Dataset(D, Net);
-
+% import true network
 A = [1 -1 -1 1 1 -1 1 0 0;
     1 -1 -1 1 1 -1 1 0 0;
     1 -1 -1 1 1 -1 1 0 0;
@@ -104,26 +108,7 @@ test_result(1).f1_bcs(1) = max(M2.F1);
 test_result(1).auroc_bcs(1) = M2.AUROC;
 test_result(1).aupr_bcs(1) = M2.AUPR;
 
-% for signed benchamrk
 
-PRE = M2.dirprec;
-REC = M2.dirsen;
-[junk,ord] = sort(M2.nlinks);
-PRE = PRE(ord);
-REC = REC(ord);
-aupr_dir = trapz(REC,PRE);
-
-TPR = M2.dirsen;
-FPR = 1 - M2.dirspe;
-[junk,ord] = sort(M2.nlinks);
-TPR = TPR(ord);
-FPR = FPR(ord);
-auroc_dir = trapz(FPR,TPR);
-max_F1_dir = max(M2.TR ./ (M2.TR + 0.5.*(M2.FI+M2.FR+M2.FZ)));
-
-test_result_dir(1).f1_bcs(1) = max_F1_dir;
-test_result_dir(1).auroc_bcs(1) = auroc_dir;
-test_result_dir(1).aupr_bcs(1) = aupr_dir;
 
 
 

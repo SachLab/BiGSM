@@ -1,10 +1,12 @@
+%%%% Benchmarking on DREAM4 data %%%%%
+
 clear
 addpath(genpath('../grn/genespider'));
 
-data_type = 'knockouts';
+data_type = 'knockdowns';  % replace with your genespider path
 
 infMethods = ["LSCON" "lasso" "svmc" "Zscore" "GENIE3"];
-% infMethods = ["LSCON"];
+
 
 test_result = {};
 
@@ -13,8 +15,6 @@ for network_idx=1:5
     file_path = "./DREAM4 training data/insilico_size100_"+num2str(network_idx)+"/insilico_size100_"+num2str(network_idx)+"_"+data_type+".tsv";
     standard_path = "./DREAM4 gold standards/insilico_size100_"+num2str(network_idx)+"_goldstandard.tsv";
     wild_path = "./DREAM4 training data/insilico_size100_"+num2str(network_idx)+"/insilico_size100_"+num2str(network_idx)+"_wildtype.tsv";
-%     file_path = "./Ecoli-1_knockdowns.tsv";
-%     standard_path = "./Ecoli-1_goldstandard.tsv";
     
     mat_wildtype = readtable(wild_path, "FileType","text",'Delimiter', '\t');
     mat_wildtype = table2array(mat_wildtype);
@@ -79,13 +79,11 @@ for network_idx=1:5
     % create a data object with your data and scale-free network
     Data = datastruct.Dataset(D,Net);
 
-
-
     for m=1:length(infMethods)
         method = infMethods(m)
     
         % infer a set of networks
-        zeta = logspace(-20,0,500); % return 30 networks of full sparsity spectrum
+        zeta = logspace(-20,0,500); 
 
         [Aest, z] = Methods.(method)(Data,zeta);
         
@@ -104,7 +102,7 @@ for network_idx=1:5
     
     max_iter = 25;
     Y = Y - mat_wildtype;
-    A_est_bcs = bigsm(P, Y', max_iter, Data, size(A));
+    A_est_bcs = bigsm(P, Y', max_iter, size(A));
     A_est_bcs(eye(N)~=0)=0;
     A_est_bcs_co = manual_test(A_est_bcs, zeta);
     

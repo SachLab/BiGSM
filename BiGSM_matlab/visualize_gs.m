@@ -1,8 +1,11 @@
+%%% Plotting results for benchmarking on GeneSPIDER %%%
+
 clear
 
-mode = "selfloop";
+mode = "selfloop"; % or no_selfloop
 
-file_name = './benchmark_result_selfloop/snr01_r1';
+file_name = './benchmark_result_selfloop/snr01_r1';  % choose results with snr and replicates
+
 load([file_name '.mat'])
 
 infMethods = ["BCS" "LSCON" "lasso" "svmc" "Zscore" "GENIE3"]; 
@@ -30,8 +33,6 @@ end
 
 
 subplot(1, 3, 2)
-% auroc_mat = auroc_mat(:);
-% h1 = boxchart(x_list, auroc_mat, 'GroupByColor', categories_list);
 
 for i = 1:6
     boxchart(i.*ones(1, 20), auroc_mat(:, i));

@@ -1,19 +1,28 @@
-clear
-addpath(genpath('../grn/genespider'));
+%%%% Benchmarking using GeneSPIDER %%%%%
 
-n_test = 20;
-SNR = 0.01; % usually 1 is low, 0.1 is medium, 0.01 is high noise
-zeta = logspace(-20,0,500);
-max_iter = 35;  % maximum iteration of bcs
+clear
+addpath(genpath('../grn/genespider'));  % replace with your genespider path
+
+n_test = 20; % number of network-expression pairs for benchmarking
+
+SNR = 0.01; % specify noise level, 1 is low, 0.1 is medium, 0.01 is high noise
+
+max_iter = 35;  % maximum iteration of BiGSM
 
 % Choose a baseline to compare
-infMethods = ["LSCON" "lasso" "svmc" "Zscore" "GENIE3"]; % lsco LSCON lasso svmc GENIE3 Zscore
+infMethods = ["LSCON" "lasso" "svmc" "Zscore" "GENIE3"]; 
 
 % define the size of your data and network
 N = 50;
+
 % define desired sparsity degree, e.g. 3 edges per node on average
-S = 3; % /(N);
-P = -[eye(N) eye(N) eye(N)]; % sample perturbation matrix
+S = 3; 
+
+% perturbation matrix and replicates, 
+% here using 3 replicates and simulating knockdown perturbation
+P = -[eye(N) eye(N) eye(N)]; 
+
+zeta = logspace(-20,0,500); % range of sparsities for evaluation
 
 for n = 1:n_test
     clear A Net X E D Data
@@ -28,16 +37,14 @@ for n = 1:n_test
     % create Network object
     Net = datastruct.Network(A, 'myNetwork');
     
-    % define perturbation matrix for the experiment
-    % for two replicates
-    
     % create data
     X = Net.G*P; % G - static gain model, A - network
+
     % add noise to data
     % define signal-to-noise ratio
-    
     s = svd(X);
     stdE = s(N)/(SNR*sqrt(chi2inv(1-analyse.Data.alpha,numel(P))));
+
     % estimate noise matrix
     E = stdE*randn(size(P));
     % input noise matrix
@@ -87,11 +94,12 @@ for n = 1:n_test
     
 
     %%%%% BiGSM %%%%%
-    A_est_bcs = bigsm(D.Y, P, max_iter, size(A));
+    A_est_bcs = bigsm(D.Y, P, max_iter, size(A)); % estimate from BiGSM
+    A_est_bcs_noselfloop = A_est_bcs.*(eye(height(A))-1); % remove selfloop
     
-    A_est_bcs_noselfloop = A_est_bcs.*(eye(height(A))-1);
-    A_est_bcs_co = manual_test(A_est_bcs, zeta);
-    A_est_bcs_co_noselfloop = manual_test(A_est_bcs_noselfloop, zeta);
+    % generate predictions over all sparsities
+    A_est_bcs_co = manual_test(A_est_bcs, zeta); % estimates with self-loops
+    A_est_bcs_co_noselfloop = manual_test(A_est_bcs_noselfloop, zeta); % estimates without self-loops
 
     M2 = analyse.CompareModels(Net,A_est_bcs_co);
     test_result(1).f1_bcs(n) = max(M2.F1);

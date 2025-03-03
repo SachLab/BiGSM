@@ -7,10 +7,8 @@ def load_mat(filename, mat_name):
     return scio.loadmat(filename)[mat_name].astype(np.float64)
 
 A = load_mat('A.mat', 'A')
-A_hat = load_mat('A_est_bcs.mat', 'A_est_bcs')
+A_hat = load_mat('A_est_bigsm.mat', 'A_est_bcs')
 alpha = load_mat('alpha.mat', 'alpha')
-# print(A)
-# print(A[1:4, 1:4])
 
 def subscript_number(n):
     # Unicode characters for subscript digits are U+2080 to U+2089

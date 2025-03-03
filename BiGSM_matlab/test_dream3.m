@@ -1,5 +1,7 @@
+%%%% Benchmarking on DREAM3 data %%%%%
+
 clear
-addpath(genpath('../grn/genespider'));
+addpath(genpath('../grn/genespider'));  % replace with your genespider path
 
 data_type = 'knockdowns';
 
@@ -13,7 +15,6 @@ for network_idx=1:5
     
 
     file_path = "./DREAM3/InSilicoSize50-" + network(network_idx) + "_knockouts.tsv";
-%     file_path1 = "./Yeast2_multifactorial_perturbations.tsv";
     standard_path = "./DREAM3/InSilicoSize50-" + network(network_idx) + "_goldstandard.tsv";
 
     mat1 = readtable(file_path,"FileType","text",'Delimiter', '\t');
@@ -25,10 +26,6 @@ for network_idx=1:5
         end
     end
     mat2 = str2double(mat2);
-
-%     mat_p = readtable(file_path1,"FileType","text",'Delimiter', '\t');
-%     mat_p = table2array(mat_p);
-
 
     header = mat1.Properties.VariableNames;
 
@@ -73,7 +70,7 @@ for network_idx=1:5
     % define zero noise
     D(1).E = E;
     D(1).F = F;
-    D(1).Y = Y; % here is where your data is assigned
+    D(1).Y = Y; 
     D(1).P = P;
     D(1).lambda = [stdE^2,0];
     D(1).cvY = D.lambda(1)*eye(N);
@@ -106,7 +103,7 @@ for network_idx=1:5
     end
     
     max_iter = 35;
-    A_est_bcs = bigsm(Y, P, max_iter, Data, size(A));
+    A_est_bcs = bigsm(Y, P, max_iter, size(A));
     A_est_bcs(eye(N)~=0)=0;
     A_est_bcs_co = manual_test(A_est_bcs, zeta);
     

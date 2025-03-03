@@ -1,10 +1,11 @@
+%%% Plotting results for benchmarking on DREAM5 %%%
+
 clear
 
+load('./DREAM5_result/dream5_results.mat')
 
-load('./dream5_results.mat')
 
-
-infMethods = ["BCS" "LSCON" "lasso" "svmc" "Zscore" "GENIE3"]; 
+infMethods = ["BiGSM" "LSCON" "lasso" "svmc" "Zscore" "GENIE3"]; 
 
 auroc_mat = [test_result.auroc_bcs' test_result.auroc_baseline ];
 f1_mat = [test_result.f1_bcs' test_result.f1_baseline ];
@@ -33,18 +34,11 @@ for j=1:2
     text(8.1*j-5.5, -0.03, network(j), FontSize=20)
 end
 
-
-% xtick_num = sort(xtick_num);
-% methods_list = [infMethods infMethods infMethods infMethods infMethods];
-% xticks(xtick_num);
-% xticklabels(methods_list)
-
 figure_width = 1500;  % Specify the width in pixels
 figure_height = 800; % Specify the height in pixels
 set(gcf, 'Position', [100, 100, figure_width, figure_height]);
 ax = gca; % Get current axis
 set(ax.YAxis, 'FontSize', 18);
 ylabel(" AUROC ", FontSize=18)
-% title("DREAM3 insilico size 50 knockouts, AUPR", FontSize=16)
 
-saveas(gcf, './dream4_result/knockdowns1.png')
+saveas(gcf, './DREAM5_result/results.png')

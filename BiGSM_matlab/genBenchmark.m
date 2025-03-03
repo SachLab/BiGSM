@@ -1,13 +1,15 @@
+%%%% Benchmarking using GRNbenchmark %%%%%
+
 clear
-addpath(genpath('../grn/genespider'));
+addpath(genpath('../grn/genespider'));  % replace with your genespider path
 
 tool = "GeneNetWeaver"; % select between GeneSPIDER and GeneNetWeaver
 nlev = "LowNoise"; % select between LowNoise, HighNoise, MediumNoise
 
-pathin = '../BenchmarkingData/Data4/';
-pathout = '../benchmark_output/';
+pathin = './grnbenchmark_data/';
+pathout = './grnbenchmark_results/';
 
-reps = 5; % repetitions, in GRN benchmark it is 5
+reps = 5; % repetitions, in GRNbenchmark it is 5
 
 for j = 1:reps
 
@@ -43,9 +45,9 @@ for j = 1:reps
     [A0, z] = Methods.(infMethod)(Data,zeta);
 
     
-    %%% Add BCS %%%
+    %%% Inference using BiGSM %%%
     max_iter = 35;
-    A_est_bcs = bigsm(Y, P, max_iter, Data, size(A));
+    A_est_bcs = bigsm(Y, P, max_iter, size(A));
     
     inet = A_est_bcs; % network to save
     wedges = compose("%9.5f",round(inet(:),5)); % keep weights

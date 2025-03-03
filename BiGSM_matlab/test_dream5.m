@@ -1,34 +1,30 @@
+%%%% Benchmarking on DREAM5 data %%%%%
+
 clear
-addpath(genpath('../grn/genespider'));
+addpath(genpath('../grn/genespider'));  % replace with your genespider path
 
 expression1_path = "./dream5/net1_expression_data.tsv";
-% expression2_path = "./dream5/net2_expression_data.tsv";
+
 expression3_path = "./dream5/net3_expression_data.tsv";
-% expression4_path = "./dream5/net4_expression_data.tsv";
+
 chip1_path = "./dream5/net1_chip_features.tsv";
-% chip2_path = "./dream5/net2_chip_features.tsv";
+
 chip3_path = "./dream5/net3_chip_features.tsv";
-% chip4_path = "./dream5/net4_chip_features.tsv";
+
 standard1_path = "./dream5/DREAM5_NetworkInference_GoldStandard_Network1 - in silico.tsv";
-% standard2_path = "./dream5/DREAM5_NetworkInference_GoldStandard_Network2 - S. aureus.txt";
+
 standard3_path = "./dream5/DREAM5_NetworkInference_GoldStandard_Network3 - E. coli.tsv";
-% standard4_path = "./dream5/DREAM5_NetworkInference_GoldStandard_Network4 - S. cerevisiae.tsv";
+
 
 expression1 = readtable(expression1_path, "FileType","text",'Delimiter', '\t');
 chip1 = readtable(chip1_path, "FileType","text",'Delimiter', '\t');
 standard1 = readtable(standard1_path, "FileType","text",'Delimiter', '\t');
 
-% expression2 = readtable(expression2_path, "FileType","text",'Delimiter', '\t');
-% chip2 = readtable(chip2_path, "FileType","text",'Delimiter', '\t');
-% standard2 = readtable(standard2_path, "FileType","text",'Delimiter', '\t');
 
 expression3 = readtable(expression3_path, "FileType","text",'Delimiter', '\t');
 chip3 = readtable(chip3_path, "FileType","text",'Delimiter', '\t');
 standard3 = readtable(standard3_path, "FileType","text",'Delimiter', '\t');
 
-% expression4 = readtable(expression4_path, "FileType","text",'Delimiter', '\t');
-% chip4 = readtable(chip4_path, "FileType","text",'Delimiter', '\t');
-% standard4 = readtable(standard4_path, "FileType","text",'Delimiter', '\t');
 
 infMethods = ["LSCON" "lasso" "svmc" "Zscore" "GENIE3"];
 test_result = {};
@@ -167,11 +163,9 @@ for dataset = 1:2
 
      for m=1:length(infMethods)
         method = infMethods(m)
-    
 
         [Aest, z] = Methods.(method)(Data,zeta);
          
-        
         M1 = analyse.CompareModels(Net,Aest);
         test_result(1).f1_baseline(dataset, m) = max(M1.F1);
         test_result(1).auroc_baseline(dataset, m) = M1.AUROC;
