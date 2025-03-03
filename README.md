@@ -3,7 +3,7 @@
 This is the code for BiGSM: Bayesian Inference of Gene Regulatory Network via Sparse Modelling. This repo includes algorithm implementation, experiments, results analysis and visualization, and datasets.
 
 ## Authors
-Hang Qin (hang@kth.se), Mateusz Garbulowski, Erik L.L. Sonnhammer, Saikat Chatterjee.
+Hang Qin (hangq@kth.se), Mateusz Garbulowski, Erik L.L. Sonnhammer, Saikat Chatterjee.
 
 ## Dependencies
 - The main experiments are implemented in MATLAB based on GeneSPDIER: https://bitbucket.org/sonnhammergrni/genespider/src/master/
